@@ -2,12 +2,12 @@
 
 ## A. Member Contributions
 
-No | ID         | Name              | Task descriptions | Contribution %
--- | ---------- | ----------------  | ----------------- | --------------
-1  | 1211100751 |                   |                   |
-2  | 1211103428 | Dylan Tarun Choo  |                   |
-3  |            |                   |                   |
-4  |            |                   |                   |
+No | ID         | Name                              | Task descriptions | Contribution %
+-- | ---------- | --------------------------------- | ----------------- | --------------
+1  | 1211100751 | Lee Jia Sheng                     |                   |       %
+2  | 1211103428 | Dylan Tarun Choo Shao Loon        |                   |       %
+3  | 1211312245 | Arief Aiman Bin Rushfuzi Faradi   |                   |       %
+4  | 1201101582 | Ooi Pui Keat                      |                   |       %
 
 
 ## B. Feature Completion
@@ -16,14 +16,14 @@ Mark Y for complete, N for incomplete.
 
 No | Feature                                                                         | Completed (Y/N)
 -- | ------------------------------------------------------------------------------- | ---------------
-1  | All cards should be faced up to facilitate checking.                            |  Y
-2  | Start a new game with randomized 52 cards.                                      |  Y
-3  | The first card in the deck is the first lead card and is placed at the center.  |
-4  | The first lead card determines the first player.                                |
-5  | Deal 7 cards to each of the 4 players.                                          |  Y
-6  | All players must follow the suit or rank of the lead card.                      |
-7  | The highest-rank card with the same suit as the lead card wins the trick.       |
-8  | The winner of a trick leads the next card.                                      |
+1  | All cards should be faced up to facilitate checking.                            |        Y
+2  | Start a new game with randomized 52 cards.                                      |        Y
+3  | The first card in the deck is the first lead card and is placed at the center.  |        Y
+4  | The first lead card determines the first player.                                |        Y
+5  | Deal 7 cards to each of the 4 players.                                          |        Y
+6  | All players must follow the suit or rank of the lead card.                      |        Y
+7  | The highest-rank card with the same suit as the lead card wins the trick.       |        N (partially)
+8  | The winner of a trick leads the next card.                                      |        N
 
 
 ## C. Link to Video Presentation
