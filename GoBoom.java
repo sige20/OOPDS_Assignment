@@ -1,7 +1,6 @@
 import java.util.*;
 
 public class GoBoom {
-    private String card;
     private int currentPlayer; // to keep track of current player
     private ArrayList<String> player1;
     private ArrayList<String> player2;
@@ -12,14 +11,6 @@ public class GoBoom {
     public static void main(String[] args) {
         GoBoom game = new GoBoom();
         game.playGame();
-    }
-
-    public void setCard(String card) {
-        this.card = card;
-    }
-
-    public String getCard() {
-        return card;
     }
 
     public void playGame() {
