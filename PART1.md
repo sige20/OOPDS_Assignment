@@ -2,15 +2,14 @@
 
 ## A. Member Contributions
 
-No | ID         | Name                              | Task descriptions                                                            | Contribution %
--- | ---------- | --------------------------------- | ---------------------------------------------------------------------------- | --------------
-1  | 1211100751 | Lee Jia Sheng                     | - Prepared a method to initialize center card, deck card                     |       25%
-   |            |                                   | - Prepared the input and output of the code                                  |
-2  | 1211103428 | Dylan Tarun Choo Shao Loon        | - Prepared the deck of cards, distribute equally to four players             |       25%
-   |            |                                   | - Prepared a method to deal cards to player                                  |
-3  | 1211312245 | Arief Aiman Bin Rushfuzi Faradi   | - Prepared a method to check the ranking or suit of every inserted           |       25%
-   |            |                                   |   card at the center pile                                                    |
-4  | 1201101582 | Ooi Pui Keat                      | - Prepared a method to determine winner of the trick                         |       25%
+No | ID         | Name                              | Task descriptions                                                                   | Contribution %
+-- | ---------- | --------------------------------- | ----------------------------------------------------------------------------------- | --------------
+1  | 1211100751 | Lee Jia Sheng                     | - Prepared a method to initialize center card, deck card                            |       25%
+   |            |                                  || - Prepared the input and output of the code                                         |
+2  | 1211103428 | Dylan Tarun Choo Shao Loon        | - Prepared the deck of cards, distribute equally to four players                    |       25%
+   |            |                                  || - Prepared a method to deal cards to player                                         |
+3  | 1211312245 | Arief Aiman Bin Rushfuzi Faradi   | - Prepared a method to check the ranking or suit of every inserted card at the center pile     |       25%
+4  | 1201101582 | Ooi Pui Keat                      | - Prepared a method to determine winner of the trick                                |       25%
 
 
 ## B. Feature Completion
