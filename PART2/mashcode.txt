@@ -1,0 +1,563 @@
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        Random random = new Random();
+
+        // Deck of cards
+        ArrayList<Card> deck = new ArrayList<>();
+        String[] suits = { "c", "s", "d", "h" };
+        String[] ranks = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
+
+        // Centerpile
+        ArrayList<Card> center = new ArrayList<>();
+
+        // Players
+        ArrayList<Player> players = new ArrayList<>();
+        int numberOfPlayers = 4;
+        for (int i = 0; i < numberOfPlayers; i++) {
+            players.add(new Player(new ArrayList<Card>(), 0));
+        }
+
+        boolean newGame = false;
+        boolean roundEnd = false;
+        boolean resetScore = false;
+
+        while (!newGame) {
+            roundEnd = false;
+
+            if (resetScore) {
+                // Reset player scores
+                for (Player player : players) {
+                    player.setScore(0);
+                }
+                resetScore = false;
+            }
+
+            deck.clear();
+            // Create deck
+            for (int i = 0; i < suits.length; i++) {
+                for (int j = 0; j < ranks.length; j++) {
+                    deck.add(new Card(suits[i], ranks[j]));
+                }
+            }
+
+            // Shuffle the deck
+            Collections.shuffle(deck);
+
+            // Add first card into center pile
+            center.clear();
+            center.add(deck.get(0));
+            deck.remove(0);
+
+            // Player turn
+            int previousTurn = 0;
+            int currentTurn = 0;
+
+            // Determine first player
+            switch (center.get(0).getRank()) {
+                case "A":
+                case "5":
+                case "9":
+                case "K":
+                    currentTurn = 0;
+                    break;
+                case "2":
+                case "6":
+                case "10":
+                    currentTurn = 1;
+                    break;
+                case "3":
+                case "7":
+                case "J":
+                    currentTurn = 2;
+                    break;
+                case "4":
+                case "8":
+                case "Q":
+                    currentTurn = 3;
+                    break;
+            }
+
+            // Randomly distribute 7 cards to each player
+            for (int i = 0; i < numberOfPlayers; i++) {
+                players.get(i).hand.clear();
+                for (int j = 0; j < 7; j++) {
+                    int randomIndex = random.nextInt(deck.size());
+                    players.get(i).addCard(deck.get(randomIndex));
+                    deck.remove(randomIndex);
+                }
+
+            }
+
+            // Records the cards played to see which player inserted highest value
+            ArrayList<Map<Card, Player>> sameSuit = new ArrayList<>();
+
+            int trick = 1;
+            while (!roundEnd) {
+                int numberOfPlays = 0;
+
+                while (numberOfPlays < 4) {
+                    // Show trick number
+                    System.out.println("Trick: " + trick);
+                    // Show Players Cards
+                    for (int i = 0; i < numberOfPlayers; i++) {
+                        System.out.println("Player" + (i + 1) + ": " + players.get(i).getHand());
+                    }
+
+                    // Center pile
+                    System.out.println("Center: " + center);
+                    // Main deck
+                    System.out.println("Main deck: " + deck + "");
+
+                    // Score
+                    for (int i = 0; i < numberOfPlayers; i++) {
+                        System.out.println("Player" + (i + 1) + "'s score: " + players.get(i).getScore());
+                    }
+                    System.out.print("\nType 'help' to view commands.\n\n");
+
+                    // Player turn
+                    System.out.println("Player turn: " + (currentTurn + 1));
+                    System.out.print(">");
+
+                    // User input
+                    String userInput = sc.nextLine();
+                    userInput = userInput.toLowerCase();
+
+                    switch (userInput) {
+                        // Draw card
+                        case "d":
+                            boolean valid = false;
+                            while (!valid) {
+                                if (deck.size() > 0) {
+                                    int randomIndex = random.nextInt(deck.size());
+                                    players.get(currentTurn).addCard(deck.get(randomIndex));
+
+                                    // Avoid infinite loop
+                                    if (deck.get(randomIndex).getRank().equals(center.get(0).getRank()) ||
+                                            deck.get(randomIndex).getSuit().equals(center.get(0).getSuit())) {
+                                        valid = true;
+                                    }
+                                    deck.remove(randomIndex);
+                                    // If empty deck, will skip the player
+                                } else {
+                                    System.out.println("No cards to draw");
+                                    System.out.println("Player" + (players.indexOf(players.get(currentTurn)) + 1)
+                                            + "'s turn will be skipped.");
+
+                                    numberOfPlays++;
+                                    switch (currentTurn) {
+                                        case 0:
+                                            currentTurn = 1;
+                                            break;
+                                        case 1:
+                                            currentTurn = 2;
+                                            break;
+                                        case 2:
+                                            currentTurn = 3;
+                                            break;
+                                        case 3:
+                                            currentTurn = 0;
+                                            break;
+                                    }
+                                    break;
+                                }
+                            }
+                            break;
+                        case "s":
+                            newGame = true;
+                            resetScore = true;
+                            break;
+                        case "x":
+                            System.exit(0);
+                            break;
+                        case "save":
+                            saveGameState(trick, deck, center, players);
+                            System.out.println("Game state saved.");
+                            break;
+                        case "load":
+                            GameState gameState = loadGameState();
+                            if (gameState != null) {
+                                // Restore game state from loaded data
+                                deck = gameState.deck;
+                                center = gameState.center;
+                                players = gameState.players;
+                                System.out.println("Game state loaded.");
+                            } else {
+                                System.out.println("No saved game state found.");
+                            }
+                            break;
+                        case "help":
+                            System.out.println("\nCommands: ");
+                            System.out.println("1. 's' = Reset game. ");
+                            System.out.println("2. 'd' = Draw card until playable card obtained. ");
+                            System.out.println("3. 'x' = Exit game ");
+                            System.out.println("4. 'save' = Save game. ");
+                            System.out.println("5. 'load' = Load game\n ");
+                            break;
+                        case "":
+                            System.out.println("Invalid input. Type help for commands.");
+                            break;
+                        default:
+
+                            // Will put card on the center pile depending on which player's turn
+                            Card insertCard;
+                            Map<Card, Player> cardInserted = new HashMap<>();
+                            boolean cardMatchCenter = false;
+                            boolean cardInHand = false;
+
+                            while (!cardMatchCenter && !cardInHand) {
+                                String chosenCard = userInput;
+                                String chosenCardSuit = Character.toString(chosenCard.charAt(0));
+                                chosenCardSuit = chosenCardSuit.toLowerCase();
+                                String chosenCardRank = chosenCard.substring(1); // .substring for cases when rank = 10
+                                chosenCardRank = chosenCardRank.toUpperCase();
+                                insertCard = new Card(chosenCardSuit, chosenCardRank);
+
+                                // check whether card exists in player's hand
+                                for (int i = 0; i < players.get(currentTurn).getHand().size(); i++) {
+                                    if (players.get(currentTurn).hand.get(i).isEqual(insertCard)) {
+                                        cardInHand = true;
+                                        // if center is empty
+                                        if (center.size() == 0) {
+                                            center.add(insertCard);
+                                            players.get(currentTurn).removeCard(players.get(currentTurn).hand.get(i));
+
+                                            cardInserted.clear();
+                                            cardInserted.put(insertCard, players.get(currentTurn));
+                                            sameSuit.add(cardInserted);
+
+                                            cardMatchCenter = true;
+                                            numberOfPlays++;
+                                            break;
+                                        }
+                                        insertCard = players.get(currentTurn).hand.get(i);
+                                        break;
+                                    } else {
+                                        cardInHand = false;
+                                    }
+                                }
+                                if (!cardInHand) {
+                                    System.out.println("Card does not exist");
+                                    break;
+                                }
+                                // Check if the card matches the rank/suit of the lead card
+                                if (!cardMatchCenter) {
+                                    // Compare suits of the inserted card and center card
+                                    if (insertCard.getSuit().equals(center.get(0).getSuit())) {
+                                        cardMatchCenter = true;
+                                        players.get(currentTurn).removeCard(insertCard);
+                                        center.add(insertCard);
+
+                                        cardInserted.clear();
+                                        cardInserted.put(insertCard, players.get(currentTurn));
+                                        sameSuit.add(cardInserted);
+
+                                        numberOfPlays++;
+                                    }
+                                    // Compare ranks of the inserted card and center card
+                                    else if (insertCard.getRank().equals(center.get(0).getRank())) {
+                                        cardMatchCenter = true;
+                                        players.get(currentTurn).removeCard(insertCard);
+                                        center.add(insertCard);
+
+                                        cardInserted.clear();
+                                        cardInserted.put(insertCard, players.get(currentTurn));
+
+                                        numberOfPlays++;
+                                    }
+                                    // Invalid cards //Either not from deck or inavlid input
+                                    else {
+                                        System.out.println("Invalid Card, Card does not match suit or rank\n");
+                                        cardMatchCenter = false;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // Begin new turn
+                            previousTurn = currentTurn;
+                            if (cardMatchCenter && cardInHand) {
+                                switch (currentTurn) {
+                                    case 0:
+                                        currentTurn = 1;
+                                        break;
+                                    case 1:
+                                        currentTurn = 2;
+                                        break;
+                                    case 2:
+                                        currentTurn = 3;
+                                        break;
+                                    case 3:
+                                        currentTurn = 0;
+                                        break;
+                                }
+                            }
+
+                    }
+
+                    // End of command switch
+                    // Determine winner of the round
+                    if (players.get(previousTurn).hand.isEmpty()) {
+                        System.out.println(
+                                "Player " + (players.indexOf(players.get(previousTurn)) + 1) + " Wins the round");
+                        roundEnd = true;
+                        break;
+                    }
+
+                    if (newGame == true) {
+                        break;
+                    }
+                } // End of players turn
+
+                if (newGame == true) {
+                    break;
+                }
+
+                // Check which player has the highest rank
+                // Same suit as the lead card
+                // if 2 have same rank, player who came first wins
+
+                Card highestRank = new Card();
+                int winnerIndex = 0;
+
+                // Assume the highest rank is the first card in the center
+                for (var entry : sameSuit.get(0).entrySet())
+                    highestRank = entry.getKey();
+
+                // Same suit and to find the highest ranking card
+                for (int i = 1; i < sameSuit.size(); i++) {
+                    for (var entry : sameSuit.get(i).entrySet()) {
+                        if (entry.getKey().getValue() > highestRank.getValue()) {
+                            highestRank = entry.getKey();
+                            winnerIndex = i;
+                        }
+                    }
+                }
+                if (!roundEnd) // Determine trick winner
+                {
+                    System.out.println("\nPlayer " + (players.indexOf(sameSuit.get(winnerIndex).get(highestRank)) + 1)
+                            + " wins trick " + trick + "\n");
+                }
+
+                // Winner of the trick leads the next turn
+                currentTurn = players.indexOf(sameSuit.get(winnerIndex).get(highestRank));
+                trick++;
+                // Clear the samesuit and center to restart trick
+                sameSuit.clear();
+                center.clear();
+                // End of trick
+            }
+
+            // Records the score of each player
+            int totalScore = 0;
+            if (roundEnd == true) {
+                for (int i = 0; i < numberOfPlayers; i++) {
+                    totalScore = 0;
+                    for (int j = 0; j < players.get(i).hand.size(); j++) {
+                        totalScore += players.get(i).hand.get(j).getValue();
+                    }
+                    players.get(i).setScore(totalScore);
+                }
+            }
+            newGame = false;
+        }
+
+    }
+
+     // Method to save the game state to a file
+    private static void saveGameState(Integer trick, ArrayList<Card> deck, ArrayList<Card> center, ArrayList<Player> players) {
+        try {
+            Scanner input = new Scanner(System.in);
+            System.out.print("File name?  ->");
+            String filename = input.nextLine();
+            
+            FileOutputStream fileOut = new FileOutputStream(filename+".ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(new GameState(trick, deck, center, players));
+            out.close();
+            fileOut.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    // Method to load the game state from a file
+    private static GameState loadGameState() {
+        try {
+            Scanner input = new Scanner(System.in);
+            System.out.print("File name?  ->");
+            String filename = input.nextLine();
+            FileInputStream fileIn = new FileInputStream(filename+".ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            GameState gameState = (GameState) in.readObject();
+            in.close();
+            fileIn.close();
+            return gameState;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class Card implements Serializable
+{
+     String suit;
+     String rank;
+     //int cardValue;
+
+     Card() {}
+
+    public Card(String suit, String rank)
+    {
+        this.suit = suit;
+        this.rank = rank;
+        //this.cardValue = calculateValue(rank);
+    }
+
+    public String getSuit()
+    {
+        return this.suit;
+    }
+
+    public String getRank()
+    {
+        return this.rank;
+    }
+
+    public int getValue()
+    {
+        switch (rank)
+        {
+            case "A":
+                return 1;
+            case "2":
+                return 2;
+            case "3":
+                return 3;
+            case "4":
+                return 4;
+            case "5":
+                return 5;
+            case "6":
+                return 6;
+            case "7":
+                return 7;
+            case "8":
+                return 8;
+            case "9":
+                return 9;
+            case "10":
+            case "J":
+            case "Q":
+            case "K":
+                return 10;
+
+            default:
+                return 0;
+        }
+    }
+
+     public boolean isEqual(Card card) 
+     {
+        if (this.suit.equals(card.getSuit()) && this.rank.equals(card.getRank()))
+        return true;
+        else 
+        return false;
+     }
+
+     /* 
+     private int calculateValue(String rank)
+     {
+        switch(rank)
+        {
+                case "A":
+                    return 1;
+                case "2":
+                    return 2;
+                case "3":
+                    return 3;
+                case "4":
+                    return 4;
+                case "5":
+                    return 5;
+                case "6":
+                    return 6;
+                case "7":
+                    return 7;
+                case "8":
+                    return 8;
+                case "9":
+                    return 9;
+                case "10":
+                    return 10;
+                case "J":
+                    return 11;
+                case "Q":
+                    return 12;
+                case "K":
+                    return 13;
+                default:
+                    return 0;
+            }
+     }
+     */
+
+     public String getCard()
+    {
+        return this.suit+this.rank;
+    }
+
+            @Override
+            public String toString() 
+            {
+            return suit + rank;
+            }
+
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+import java.io.Serializable;
+import java.util.*;
+
+class Player implements Serializable{
+     ArrayList<Card> hand;
+     int score;
+
+    public Player(ArrayList<Card> hand, int score)
+    {
+        this.hand = hand;
+        this.score = score;
+    }
+
+    public ArrayList<Card> getHand()
+    {
+        return hand;
+    }
+
+    public int getScore()
+    {
+        return score;
+    }
+
+    public void addCard(Card card)
+    {
+        hand.add(card);
+    }
+
+    public void removeCard(Card card)
+    {
+        hand.remove(card);
+    }
+
+    public void setScore(int score)
+    {
+        this.score = score;
+    }
+}
