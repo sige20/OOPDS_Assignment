@@ -6,10 +6,10 @@ No | ID         | Name                              | Task descriptions         
 -- | ---------- | --------------------------------- | ---------------------------------------------------------------------------------------- | --------------
 1  | 1211100751 | Lee Jia Sheng                     | - Prepared saving option so that game can be exited and saved                            |       25%
    |            |                                  || - Prepared the input and output of the code                                              |
-   |            |                                   | - Fixed the reset game option                                                            |
+   |            |                                  || - Fixed the reset game option                                                            |
 2  | 1211103428 | Dylan Tarun Choo Shao Loon        | - Prepared the display for the score of each player                                      |       25%
    |            |                                  || - Prepared the draw card option until playable card is obtained                          |
-   |            |                                   | - Prepared the reset game option                                                         |
+   |            |                                  || - Prepared the reset game option                                                         |
 3  | 1211312245 | Arief Aiman Bin Rushfuzi Faradi   | - Made sure player's turn is skipped when main deck is exhausted                         |       25%
 4  | 1201101582 | Ooi Pui Keat                      | - Fixed the the trick winner bug from previous part I                                    |       25%
 
